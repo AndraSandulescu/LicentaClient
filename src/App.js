@@ -33,7 +33,7 @@ import Home from './pages';
 import About from './pages/about';
 // import Blogs from './pages/blogs';
 import SignUp from './pages/signup';
-import comparePoliticians from './pages/comparePoliticians';
+import ComparePoliticians from './pages/comparePoliticians';
 import ScrapeTweets from './pages/scrapeTweets';
 
 //fisier doar pt rute
@@ -45,7 +45,7 @@ function App() {
 			<Routes>
 				<Route exact path='/' exact element={<Home />} />
 				<Route path='/about' element={<About />} />
-				<Route path='/comparePoliticians' element={<comparePoliticiansF />} />
+				<Route path='/comparePoliticians' element={<ComparePoliticians />} />
 				{/* <Route path='/blogs' element={<Blogs />} /> */}
 				<Route path='/sign-up' element={<SignUp />} />
 				<Route path='/scrape-tweets' element={<ScrapeTweets />} />

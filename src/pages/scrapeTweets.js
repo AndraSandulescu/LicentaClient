@@ -195,7 +195,7 @@ const ScrapeTweets = () => {
         <div class = "entirePage"id="root">
 
 
-            <h1>Scrape Tweets</h1>
+            <h1>Scrape Tweets</h1><br/><br/><br/>
 
             {/* <aside className="sidebar">
                 <Sidebar />
@@ -231,6 +231,7 @@ const ScrapeTweets = () => {
                             selected={since}
                             onChange={(date) => setSince(date)}
                             placeholderText="Since"
+                            dateFormat="yyyy/MM/dd"
                         />
 
                         <label htmlFor="until">Until:</label>
@@ -239,6 +240,7 @@ const ScrapeTweets = () => {
                             selected={until}
                             onChange={(date) => setUntil(date)}
                             placeholderText="Until"
+                            dateFormat="yyyy/MM/dd"
                         />
                     </div>
 
@@ -345,7 +347,7 @@ const ScrapeTweets = () => {
                                         <tr>
                                             <th>#</th> {/* Adaugă antetul coloanei de index */}
                                             <th>User</th>
-                                            <th>Date Time</th>
+                                            <th>Data</th>
                                             <th>Text</th>
                                             <th>Sentiment</th>
                                         </tr>

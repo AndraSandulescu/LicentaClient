@@ -7,7 +7,7 @@
   background-color: #1e1f2500;
   border-radius: 20px;
   max-height: 400px;
-  padding: 0 10px 10px 10px;
+  padding: 20px 10px 10px 10px;
   overflow: auto;
 }
 
@@ -32,6 +32,9 @@ th {
 }
 
 /* Stilizare pentru rândurile tabelului */
+tbody{
+  min-height: 100px;
+}
 tbody tr:nth-child(even) {
   background-color: #f2f2f2;
 }
