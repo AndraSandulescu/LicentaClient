@@ -65,11 +65,11 @@ const ComparePoliticians = () => {
 
 
     const politiciansList = [
-        { id: 0, name: 'AlexandriaOcasioCortez' },
+        { id: 0, name: 'Alexandria Ocasio-Cortez' },
         { id: 1, name: 'Barack Obama' },
         { id: 2, name: 'Bill Clinton' },
         { id: 3, name: 'Chuck Schumer' },
-        { id: 4, name: 'CoryBooker' },
+        { id: 4, name: 'Cory Booker' },
         { id: 5, name: 'Elizabeth Warren' },
         { id: 6, name: 'Hillary Clinton' },
         { id: 7, name: 'Ilhan Omar' },

@@ -31,7 +31,7 @@ import Navbar from './components/Navbar';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages';
 import About from './pages/about';
-// import Blogs from './pages/blogs';
+import LatestNews from './pages/LatestNews';
 import SignUp from './pages/signup';
 import ComparePoliticians from './pages/comparePoliticians';
 import ScrapeTweets from './pages/scrapeTweets';
@@ -46,7 +46,7 @@ function App() {
 				<Route exact path='/' exact element={<Home />} />
 				<Route path='/about' element={<About />} />
 				<Route path='/comparePoliticians' element={<ComparePoliticians />} />
-				{/* <Route path='/blogs' element={<Blogs />} /> */}
+				<Route path='/LatestNews' element={<LatestNews />} />
 				<Route path='/sign-up' element={<SignUp />} />
 				<Route path='/scrape-tweets' element={<ScrapeTweets />} />
 			</Routes>

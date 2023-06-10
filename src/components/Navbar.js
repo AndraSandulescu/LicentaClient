@@ -13,9 +13,9 @@ const Navbar = () => {
 					<NavLink to="/comparePoliticians" activeStyle>
 						Compare Political Views
 					</NavLink>
-					{/* <NavLink to="/blogs" activeStyle>
-						Blogs
-					</NavLink> */}
+					<NavLink to="/latestNews" activeStyle>
+						Latest News
+					</NavLink>
 					<NavLink to="/sign-up" activeStyle>
 						Sign Up
 					</NavLink>
