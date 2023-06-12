@@ -1,0 +1,86 @@
+.homePage {
+    padding-top: 80px;
+}
+
+.chenarContinut {
+
+    /* background-color: #837aff; */
+    background-color: #002147;
+    color: rgba(255, 255, 255, 0.905);
+    border-radius: 0 0 20px 20px;
+    padding: 50px 20px 20px 20px;
+    margin: 0 auto;
+    /* margin-top: -18vh; */
+    margin-bottom: 10vh;
+    min-height: fit-content;
+    height: 75vh;
+    width: 85vw;
+    /* display: flex; */
+    display: table;
+    justify-content: center;
+    text-align: justify;
+
+}
+
+
+.chenarContinut .btn-login {
+    margin-top: 20px;
+    width: 230px;
+}
+
+h3 {
+    margin-top: 25px;
+    color: #e6b811;
+}
+
+
+/* buton login page */
+.btn-login {
+    width: 200px;
+    height: 50px;
+    border: 2px solid #e6b811;
+    border-radius: 10px;
+    background-color: transparent;
+    color: #e6b811;
+    font-size: 16px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-login:hover {
+    background-color: #e6b811;
+    color: #002147;
+}
+
+.btn-login.clicked {
+    background-color: #e6b811;
+    color: #002147;
+}
+
+
+.col {
+    /* display: grid; */
+    margin-top: 70px;
+    padding-bottom: 20px;
+}
+
+.row {
+    height: 100%;
+}
+
+.line {
+    border-right: 1px solid rgb(255, 255, 255);
+    margin-right: -1px;
+}
+
+
+.centrat {
+    /* display: grid; */
+}
+
+.header {
+    margin-bottom: 40px;
+}
+
+.chenarContinutSignUp{
+    width: 100%;
+}

@@ -1,15 +1,7 @@
-.entirePage {
-  margin-top: 150px;
-  /* background-color: rgb(255, 255, 255); */
-  /* display: flex; */
-  /* display: block; */
-  width: 98.3vw;
-  height: 100vh;
 
-}
+
 
 div.row {
-  /* min-width: 1887px; */
   width: 100%;
 }
 
@@ -65,19 +57,11 @@ DatePicker {
 }
 
 
-h1 {
-  text-align: center;
-  position: absolute;
-  /* top: 50%; */
-  margin-top: 20px;
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
+
 
 .statisticsContainer {
   /* display: 'flex'; */
+  background-color: #f0fbff;
   justify-content: 'center';
   width: 50%;
 }
@@ -88,16 +72,6 @@ h1 {
 
 h3 {
   padding-top: 20px;
-
 }
 
 
-.newsFeedTable {
-  border-radius: 20px;
-  max-height: 6000px;
-  /* margin: 10px 10px 10px 10px; */
-  overflow: clip;
-  max-width: 1500px;
-  /* left: 50%; */
-  /* transform: translate(7, 0%); */
-}

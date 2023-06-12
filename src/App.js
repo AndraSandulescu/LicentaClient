@@ -29,7 +29,7 @@ import React from 'react';
 import './App.css';
 import Navbar from './components/Navbar';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages';
+import Home from './pages/Home';
 import About from './pages/about';
 import LatestNews from './pages/LatestNews';
 import SignUp from './pages/signup';
@@ -43,8 +43,9 @@ function App() {
 		<Router>
 			<Navbar />
 			<Routes>
-				<Route exact path='/' exact element={<Home />} />
-				<Route path='/about' element={<About />} />
+				{/* <Route exact path='/' element={<Home />} /> */}
+				<Route path='/Home' element={<Home />} />
+				{/* <Route path='/about' element={<About />} /> */}
 				<Route path='/comparePoliticians' element={<ComparePoliticians />} />
 				<Route path='/LatestNews' element={<LatestNews />} />
 				<Route path='/sign-up' element={<SignUp />} />

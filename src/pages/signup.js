@@ -1,89 +1,121 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+// import { format, isSameDay } from "date-fns";
+import { MDBRow, MDBCol } from 'mdb-react-ui-kit';
+import './centralizedStyling.css';
+import { useNavigate } from 'react-router-dom';
 
-//facem login, preluam token si il punem in local storage
-class LoginButton extends Component {
+const SignUp = () => {
+  const navigate = useNavigate();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  getSearchResultsClick() {
+  const [signUpUsername, setSignUpUsername] = useState('');
+  const [signUpPassword, setSignUpPassword] = useState('');
 
-    const headers = {};
-
+  const handleLogin = () => {
     const data = {
-      nickname: 'admin',
-      password: 'admin'
+      nickname: username,
+      password: password
     };
 
-    //daca bagi credentiale gresite o sa primesti raspuns de eroare cu codul 401, request failed. 
-    // Ar trb schimbat pe server, sa trimita un raspuns cu cod 200 (request succes) dar sa contina un raspuns care sa sugereze 
-    //ca credentialele au fost gresite
-    axios.post('https://localhost:7112/api/Login', data, { headers })
+    axios.post('https://localhost:7112/api/Login', data)
       .then(response => {
-        // Process the response data here
         console.log(response.data);
-        localStorage.setItem('acces_token', response.data.token);
-        localStorage.setItem('user_id', response.data.user_id); // Stocati ID-ul unic al utilizatorului
-
+        localStorage.setItem('access_token', response.data.token);
+        localStorage.setItem('user_id', response.data.user_id);
+        setIsAuthenticated(true);
+        navigate('/LatestNews'); // Redirecționează utilizatorul la pagina LatestNews
       })
       .catch(error => {
-        // Handle any errors that occurred during the request
         console.error(error);
+        setErrorMessage('Utilizatorul nu a fost găsit');
       });
-  }
+  };
 
-  render() {
-    return (
-      <div>
-        <p>
-          <button onClick={this.getSearchResultsClick}>Log In</button>
-        </p>
-      </div>
-    );
-  }
-}
 
-//luam  token din local storage, il adaugam la  headers si facem requestul cu el. Acum suntem autentificati
-class UseTokenExampleButton extends Component {
 
-  getSearchResultsClick() {
-    
-    const token = localStorage.getItem('acces_token');
-    const headers = {
-      Authorization: `Bearer ${token}`
+
+  const handleSignUp = () => {
+    const data = {
+      nickname: signUpUsername,
+      password: signUpPassword
     };
 
-    axios.get('https://localhost:7112/api/Login/test', { headers })
+    axios.post('https://localhost:7112/api/Login/Register', data)
       .then(response => {
-        // Process the response data here
         console.log(response.data);
-
+        setIsAuthenticated(true);
+        // Poți adăuga logica de redirecționare aici
       })
       .catch(error => {
-        // Handle any errors that occurred during the request
         console.error(error);
+        setErrorMessage('A apărut o eroare la înregistrare');
       });
-  }
+  };
 
-  render() {
-    return (
-      <div>
-        <p>
-          <button onClick={this.getSearchResultsClick}>Test token</button>
-        </p>
-      </div>
-    );
-  }
-}
 
-class SignUp extends Component {
-  render() {
-    return (
-      <div>
-        <h1>Sign Up Successful</h1>
-        <LoginButton />
-        <UseTokenExampleButton />
+
+
+
+  return (
+    <div>
+      <div className="centralizeContainer">
+        <div className="chenarContinutSignUp">
+          <MDBRow d-flex align-items-center justify-content-center>
+            <MDBCol className="col align-items-center justify-content-center centrat">
+              <h1 className='header'>Log In</h1>
+              <br /><br />
+              <input
+                className='formControl'
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+              />
+              <br />
+              <input
+                className='formControl'
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+              /><br />
+              <button className="btn-login" onClick={handleLogin}>
+                Log In
+              </button>
+              {errorMessage && <p>{errorMessage}</p>}
+            </MDBCol>
+            <MDBCol className="col align-items-center justify-content-center centrat">
+              <h1>Sign Up</h1>
+              <br /><br />
+              <input
+                className='formControl'
+                type="text"
+                placeholder="Username"
+                value={signUpUsername}
+                onChange={e => setSignUpUsername(e.target.value)}
+              />
+              <br />
+              <input
+                className='formControl'
+                type="password"
+                placeholder="Password"
+                value={signUpPassword}
+                onChange={e => setSignUpPassword(e.target.value)}
+              />
+              <br />
+              <button className="btn-login" onClick={handleSignUp}>
+                Sign Up
+              </button>
+            </MDBCol>
+          </MDBRow>
+        </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default SignUp;

@@ -2,15 +2,11 @@ import React, { Component, useState } from 'react';
 import axios from 'axios';
 import DatePicker from "react-datepicker";
 import { format } from "date-fns";
-import { MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
+import { MDBRow, MDBCol } from 'mdb-react-ui-kit';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-
-import "./scrapeTweets.css"
+import Select from 'react-select';
 import "./comparePoliticians.css"
-
+import './centralizedStyling.css';
 
 const ComparePoliticians = () => {
 
@@ -24,14 +20,14 @@ const ComparePoliticians = () => {
 
 
 
-    const [text, setText] = useState('text');
+    const [text, setText] = useState('');
     const [since, setSince] = useState(null);
     const [until, setUntil] = useState(null);
 
 
     //statistici
     const [isVisibleStatistics, setIsVisibleStatistics] = useState(false);
-    const COLORS = ['#7b26eb', '#00c7a2'];
+    const COLORS = ['#0255db', '#cfa304'];
 
     const [posTweets1, setPosTweets1] = useState(0);
     const [totalTweets1, setTotalTweets1] = useState(0);
@@ -54,14 +50,23 @@ const ComparePoliticians = () => {
         { sentiment: 'negativ sau incert', count: totalTweets2 - posTweets2 }
     ];
 
-    const handlePoliticianChange1 = event => {
-        const selectedPolitician1 = event.target.value;
-        setSelectedPolitician1(selectedPolitician1);
+    // const handlePoliticianChange1 = event => {
+    //     const selectedPolitician1 = event.target.value;
+    //     setSelectedPolitician1(selectedPolitician1);
+    // };
+    // const handlePoliticianChange2 = event => {
+    //     const selectedPolitician2 = event.target.value;
+    //     setSelectedPolitician2(selectedPolitician2);
+    // };
+
+    const handlePoliticianChange1 = selectedOption => {
+        setSelectedPolitician1(selectedOption);
     };
-    const handlePoliticianChange2 = event => {
-        const selectedPolitician2 = event.target.value;
-        setSelectedPolitician2(selectedPolitician2);
+
+    const handlePoliticianChange2 = selectedOption => {
+        setSelectedPolitician2(selectedOption);
     };
+
 
 
     const politiciansList = [
@@ -84,9 +89,6 @@ const ComparePoliticians = () => {
         { id: 16, name: 'Ted Cruz' }
     ]
 
-
-
-    //submit la formular
     const handleSubmit = async event => {
         event.preventDefault(); // Prevent page reload
         // Get the values
@@ -107,6 +109,9 @@ const ComparePoliticians = () => {
             const response = await axios.get('https://localhost:7112/api/ComparePoliticians/Compare', { params: formValues });
 
             const { response1, response2 } = response.data;
+
+            console.log(response)
+
             setResponse1(response1); // Update the state for politician 1 response
             setResponse2(response2); // Update the state for politician 2 response
 
@@ -140,6 +145,8 @@ const ComparePoliticians = () => {
 
             setIsVisibleStatistics(true)
 
+            console.log(response.data)
+
         } catch (error) {
             console.error(error); // Log the error to the console in case of failure
         }
@@ -165,13 +172,11 @@ const ComparePoliticians = () => {
         <div className="entirePage" id="root">
             <h1> Comparati opiniile politice </h1><br /><br /><br /><br />
             <div className="topOfPage">
-                {/* Conținutul formularului de filtrare */}
-                {/* <form onSubmit={handleSubmit}> */}
-                {/* Elementele formularului */}
+
                 <MDBRow>
                     <MDBCol className="col d-flex align-items-center justify-content-center">
-                        <label htmlFor="text">Text de cautat:</label>
-                        <input
+                        <label className="formLabel" htmlFor="text">Text de cautat:</label>
+                        <input className='formControl'
                             type="text"
                             id="text"
                             value={text}
@@ -179,8 +184,9 @@ const ComparePoliticians = () => {
                         />
                     </MDBCol>
                     <MDBCol className="col d-flex align-items-center justify-content-center">
-                        <label htmlFor="since">De la data:</label>
+                        <label className="formLabel" htmlFor="since">De la data:</label>
                         <DatePicker
+                            className='formControl'
                             id="since"
                             selected={since}
                             onChange={(date) => setSince(date)}
@@ -189,8 +195,9 @@ const ComparePoliticians = () => {
                         />
                     </MDBCol>
                     <MDBCol className="col d-flex align-items-center justify-content-center">
-                        <label htmlFor="until">Pana la data:</label>
+                        <label className="formLabel" htmlFor="until">Pana la data:</label>
                         <DatePicker
+                            className='formControl'
                             id="until"
                             selected={until}
                             onChange={(date) => setUntil(date)}
@@ -199,7 +206,7 @@ const ComparePoliticians = () => {
                         />
                     </MDBCol>
                     <MDBCol className="col d-flex align-items-center justify-content-center">
-                        <button className="btn btn-indigo" type="submit" onClick={handleSubmit}>Submit</button>
+                        <button className="btn btn-yellow btn-compare" type="submit" onClick={handleSubmit}>Submit</button>
                     </MDBCol>
                 </MDBRow>
                 {/* </form>F */}
@@ -207,33 +214,38 @@ const ComparePoliticians = () => {
             <MDBRow>
                 <MDBCol className="col d-flex align-items-center justify-content-center">
                     {/* Conținutul primei părți a paginii */}
-                    <label>
+                    <label className="formLabel">
                         Politician:
                     </label>
-                    <select value={selectedPolitician1} onChange={handlePoliticianChange1} id="politician1">
-                        <option value="">Alegeți un politician</option>
-                        {politiciansList.map(politician => (
-                            <option key={politician.id} value={politician.id}>
-                                {`${politician.name}`}
-                            </option>
-                        ))}
-                    </select>
+                    <Select
+                        className="formControlSelect"
+                        id="politician1"
+                        value={selectedPolitician1}
+                        options={politiciansList.map(politician => ({
+                            value: politician.id,
+                            label: politician.name
+                        }))}
+                        onChange={handlePoliticianChange1}
+                    />
+
                 </MDBCol>
                 <MDBCol className="col d-flex align-items-center justify-content-center">
                     {/* Conținutul celei de-a doua părți a paginii */}
-                    <form>
-                        <label>
-                            Politician:
-                        </label>
-                        <select value={selectedPolitician2} onChange={handlePoliticianChange2} id="politician2">
-                            <option value="">Alegeți un politician</option>
-                            {politiciansList.map(politician => (
-                                <option key={politician.id} value={politician.id}>
-                                    {`${politician.name}`}
-                                </option>
-                            ))}
-                        </select>
-                    </form>
+
+                    <label className="formLabel">
+                        Politician:
+                    </label>
+                    <Select
+                        className="formControlSelect"
+                        id="politician2"
+                        value={selectedPolitician2}
+                        options={politiciansList.map(politician => ({
+                            value: politician.id,
+                            label: politician.name
+                        }))}
+                        onChange={handlePoliticianChange2}
+                    />
+
                 </MDBCol>
             </MDBRow>
             <br />
@@ -244,28 +256,36 @@ const ComparePoliticians = () => {
                         {response1.results && (
                             <div>
                                 <h2>Tweet-uri pentru primul politician</h2>
-                                <div className="tableContainer">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Data</th>
-                                                <th>Text</th>
-                                                <th>Sentiment</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {response1.results.map((item, index) => (
-                                                <tr key={index}>
-                                                    <td>{index + 1}</td>
-                                                    <td>{format(new Date(item.searchCsv.dateTime), "yyyy-MM-dd")}</td>
-                                                    <td>{item.searchCsv.text}</td>
-                                                    <td>{item.sentiment}</td>
+                                {response1.results.length > 0 ? (
+                                    <div className="tableContainer">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Data</th>
+                                                    <th>Text</th>
+                                                    <th>Sentiment</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                            </thead>
+                                            <tbody>
+                                                {response1.results.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{index + 1}</td>
+                                                        <td>{format(new Date(item.searchCsv.dateTime), "yyyy-MM-dd")}</td>
+                                                        <td>{item.searchCsv.text}</td>
+                                                        <td>{item.sentiment}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+
+                                ) : (
+                                    <p>Nu s-au găsit tweet-uri pentru primul politician.</p>
+                                )}
+
+
                             </div>
                         )}
                     </div>

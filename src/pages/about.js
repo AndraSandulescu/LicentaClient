@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import "./centralizedStyling.css"
 
 
 // de exemplu, acest button ar trb sa fie intr-un fisier separat, in folderul components si sa fie inclus aici si folosit
@@ -18,22 +19,6 @@ class MyButton extends Component {
       });
   }
 
-  // getSearchResultsClick(){
-
-  //   const headers = {
-
-  //   };
-  //   axios.get('https://localhost:7112/api/Search/SearchScript',{headers})
-  //   .then(response => {
-  //       // Process the response data here
-  //       console.log(response.data);
-  //       console.log(response.data[0].tweetId);
-  //   })
-  //   .catch(error => {
-  //       // Handle any errors that occurred during the request
-  //       console.error(error);
-  //   });
-  // }
 
   getScrapedTweets(){
 
@@ -54,12 +39,11 @@ class MyButton extends Component {
   render() {
     return (
         <div>
+          <br/><br/><br/><br/><br/><br/><br/>
+          <h1>Welcome to PolitiMood!</h1><br/>
             <p>
                 <button onClick={this.handleClick}>Print to console a json</button>
             </p>
-            {/* <p>
-                <button onClick={this.getSearchResultsClick}>Search from licenta</button>
-            </p> */}
             <p>
                 <button onClick={this.getScrapedTweets}>Scrape!!</button>
             </p>
@@ -73,8 +57,6 @@ class About extends Component {
     return (
       <div>
         <h1>
-          GeeksforGeeks is a Computer
-          Science portal for geeks.
         </h1>
         <MyButton />
       </div>

@@ -7,7 +7,7 @@ position : fixed;
 top: 0;
 left: 0;
 right: 0;
-background: #4c84f5;
+background: #001731;
 height: 85px;
 display: flex;
 justify-content: space-between;
@@ -25,7 +25,7 @@ padding: 0 1rem;
 height: 100%;
 cursor: pointer;
 &.active {
-	color: #dad4fa;
+	color: #f2b407;
 }
 `;
 
@@ -47,7 +47,7 @@ export const NavMenu = styled.div`
 
 display: flex;
 align-items: center;
-margin-right: -24px;
+/*margin-right: -24px;*/
 /* Second Nav */
 /* margin-right: 24px; */
 /* Third Nav */

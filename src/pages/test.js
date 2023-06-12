@@ -1,20 +1,14 @@
-
 import React, { useState } from "react";
-import './centralizedStyling.css';
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
-import { MDBRow, MDBCol } from 'mdb-react-ui-kit';
-import Select from 'react-select'
-
 import Sidebar from '../components/Sidebar'
 import { slide as Menu } from 'react-burger-menu';
-
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 
-const ScrapeTweets = () => {
+const SearchTweets = () => {
     const rootElement = document.getElementById("root");
 
     //hide si show
@@ -22,17 +16,16 @@ const ScrapeTweets = () => {
     const [isVisiblepreviousSearches, setIsVisiblepreviousSearches] = useState(false);
     const [isVisibleSentAnButton, setIsVisibleSentAnButton] = useState(false);
     const [isVisibleSentTable, setIsVisibleSentTable] = useState(false);
-    const [isVisibleStatistici, setIsVisibleStatistici] = useState(false);
 
     //stari:
     //formular cautare
-    const [text, setText] = useState('');
-    const [username, setUsername] = useState('');
+    const [text, setText] = useState('covid');
+    const [username, setUsername] = useState('JoeBiden');
     const [since, setSince] = useState(null);
     const [until, setUntil] = useState(null);
     const [retweet, setRetweet] = useState('n');
     const [replies, setReplies] = useState('n');
-    const [count, setCount] = useState('');
+    const [count, setCount] = useState(5);
 
 
     //cautari anterioare si index
@@ -58,17 +51,7 @@ const ScrapeTweets = () => {
         { sentiment: 'restul', count: totalTweets - posTweets }
     ];
 
-    const COLORS = ['#0255db', '#cfa304'];
-
-
-    //select options
-
-    const options = [
-        { value: 'y', label: 'yes' },
-        { value: 'n', label: 'no' }
-    ]
-
-
+    const COLORS = ['#7b26eb', '#f5390a'];
     // const RADIAN = Math.PI / 180;
 
 
@@ -88,64 +71,85 @@ const ScrapeTweets = () => {
         e.preventDefault();
 
         setIsVisibleTableScraped(true);
+        const formattedSince = since ? format(since, "yyyy-MM-dd") : "";
+        const formattedUntil = until ? format(until, "yyyy-MM-dd") : "";
+        // const userId = localStorage.getItem('user_id');
 
-        try {
-            const userId = localStorage.getItem('user_id');
-
-            const formattedSince = since ? format(since, "yyyy-MM-dd") : "";
-            const formattedUntil = until ? format(until, "yyyy-MM-dd") : "";
-            console.log(text,
-                username,
-                formattedSince,
-                formattedUntil,
-                retweet,
-                replies,
-                count,
-                userId)
-            const response = await axios.get("https://localhost:7112/api/Search/SearchScript", {
-                params: {
-                    text,
-                    username,
-                    since: formattedSince,
-                    until: formattedUntil,
-                    retweet,
-                    replies,
-                    count,
-                    // userId
-                },
-            });
-
-            console.log("raspuns")
-            console.log(response.data); // Handle the response data as per your requirements
-            if (response.data.results && response.data.results.length > 0) {
-                setTableData(response.data.results);
-                setIsVisibleSentAnButton(true);
-                setIsVisiblepreviousSearches(true);
-            } else {
-                setTableData([]); // sau o valoare implicită pentru tableData când nu există rezultate
-            }
-            setSearchIndex(response.data.searchIndex); // Setează indexul căutării în stare
-            // setTableData(response.data.results); // Adăugați această linie pentru a actualiza datele tabelului
-
-            console.log("Results == table data: ")
-            // console.log(response.data.results)
-            console.log(tableData)
-
-            const newSearch = {
+        // https://localhost:7112/api/Search/SearchScript
+        axios.get('https://localhost:7112/api/Search/SearchScript', {
+            params: {
                 text,
                 username,
                 since: formattedSince,
                 until: formattedUntil,
                 retweet,
                 replies,
-                searchIndex: response.data.searchIndex,
-            };
-            setPreviousSearches([...previousSearches, newSearch]);
+                count,
+                // userId
+            }
+        })
+            .then(response => {
+                console.log(response.data);
+                // Manipulați răspunsul în funcție de necesitățile dvs.
+            })
+            .catch(error => {
+                console.error(error);
+                // Gestionați eroarea în funcție de necesitățile dvs.
+            });
 
-        } catch (error) {
-            console.error(error);
-        }
+        // axios.get('https://localhost:7112/api/Search/SearchScript') asta a mers
+        // .then(response => {
+        //   // Manipulați răspunsul cu succes aici
+        //   console.log(response.data);
+        // })
+        // .catch(error => {
+        //   // Manipulați eroarea aici
+        //   console.error(error);
+        // });
 
+        // try {
+        //     const userId = localStorage.getItem('user_id');
+
+        //     const formattedSince = since ? format(since, "yyyy-MM-dd") : "";
+        //     const formattedUntil = until ? format(until, "yyyy-MM-dd") : "";
+
+        //     const response = await axios.get("https://localhost:7112/api/Search/SearchScript", {
+        //         params: {
+        //             text,
+        //             username,
+        //             since: formattedSince,
+        //             until: formattedUntil,
+        //             retweet,
+        //             replies,
+        //             count,
+        //             userId
+        //         },
+        //     });
+
+        //     console.log("raspuns")
+        //     console.log(response.data); // Handle the response data as per your requirements
+        //     setSearchIndex(response.data.searchIndex); // Setează indexul căutării în stare
+        //     setTableData(response.data.results); // Adăugați această linie pentru a actualiza datele tabelului
+
+        //     console.log("Results == table data: ")
+        //     // console.log(response.data.results)
+        //     console.log(tableData)
+
+        //     const newSearch = {
+        //         text,
+        //         username,
+        //         since: formattedSince,
+        //         until: formattedUntil,
+        //         retweet,
+        //         replies,
+        //         searchIndex: response.data.searchIndex,
+        //     };
+        //     setPreviousSearches([...previousSearches, newSearch]);
+        //     setIsVisibleSentAnButton(true);
+        // } catch (error) {
+        //     console.error(error);
+        // }
+        setIsVisiblepreviousSearches(true);
     };
 
     const handleSentimentAnalysis = async () => {
@@ -191,7 +195,7 @@ const ScrapeTweets = () => {
 
                 console.log("(response.data.results")
                 console.log(response.data.results)
-                setIsVisibleStatistici(true)
+
 
 
             } catch (error) {
@@ -222,114 +226,89 @@ const ScrapeTweets = () => {
 
     return (
 
-        <div className="entirePage" id="root">
+        <div class="entirePage" id="root">
 
 
-            <h1>Scrape Tweets</h1><br /><br /><br />
+            <h1>Scrape Tweets</h1>
+
+            {/* <aside className="sidebar">
+                <Sidebar />
+            </aside> */}
+
+
+
 
             <div id="scrapeForm">
-                <MDBRow>
-                    <MDBCol className="col d-flex align-items-center justify-content-center">
-                        <label className="formLabel" htmlFor="text">Text:</label>
+                <form onSubmit={handleSubmit}>
+                    <div>
+                        <label htmlFor="text">Text:</label>
                         <input
-                            className="formControl"
                             type="text"
                             id="text"
                             value={text}
                             onChange={(e) => setText(e.target.value)}
                         />
 
-                    </MDBCol>
-
-                    <MDBCol className="col d-flex align-items-center justify-content-center">
-                        <label className="formLabel" htmlFor="username">Username:</label>
+                        <label htmlFor="username">Username:</label>
                         <input
-                            className="formControl"
                             type="text"
                             id="username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                         />
-                    </MDBCol>
+                    </div>
 
-                    <MDBCol className="col d-flex align-items-center justify-content-center">
-                        <label className="formLabel" htmlFor="since">Since:</label>
+                    <div>
+                        <label htmlFor="since">Since:</label>
                         <DatePicker
-                            className="formControl"
                             id="since"
                             selected={since}
                             onChange={(date) => setSince(date)}
-                            // placeholderText="Since"
-                            dateFormat="yyyy/MM/dd"
+                            placeholderText="Since"
                         />
-                    </MDBCol>
-                    <MDBCol className="col d-flex align-items-center justify-content-center">
-                        <label className="formLabel" htmlFor="until">Until:</label>
+
+                        <label htmlFor="until">Until:</label>
                         <DatePicker
-                            className="formControl"
                             id="until"
                             selected={until}
                             onChange={(date) => setUntil(date)}
-                            // placeholderText="Until"
-                            dateFormat="yyyy/MM/dd"
+                            placeholderText="Until"
                         />
-                    </MDBCol>
-                </MDBRow>
+                    </div>
 
-                <MDBRow>
-                    <MDBCol className="col d-flex align-items-center justify-content-center">
-                        <label className="formLabel" htmlFor="retweet">Retweets:</label>
+                    <div>
+                        <label htmlFor="retweet">Retweets:</label>
+                        <select id="retweet" value={retweet} onChange={(e) => setRetweet(e.target.value)}>
+                            <option value="">Retweets</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
 
-                        <Select
-                            // className="formControl"
-                            className="formControlSelect"
-                            id="retweet"
-                            value={options.find(option => option.value === retweet)}
-                            options={options}
-                            onChange={(selectedOption) => setRetweet(selectedOption.value)}
-                        />
+                        <label htmlFor="replies">Replies:</label>
+                        <select id="replies" value={replies} onChange={(e) => setReplies(e.target.value)}>
+                            <option value="">Replies</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
 
-                    </MDBCol>
-                    <MDBCol className="col d-flex align-items-center justify-content-center">
-                        <label className="formLabel" htmlFor="replies">Replies:</label>
-                        <Select
-                            className="formControlSelect"
-                            id="retweet"
-                            value={options.find(option => option.value === retweet)}
-                            options={options}
-                            onChange={(selectedOption) => setRetweet(selectedOption.value)}
-                        />
-                    </MDBCol>
-                    <MDBCol className="col d-flex align-items-center justify-content-center">
-                        <label className="formLabel" htmlFor="count">Count:</label>
-                        <input className="formControl"
+                        <label htmlFor="count">Count:</label>
+                        <input
                             type="number"
                             id="count"
                             value={count}
-                            // onChange={(e) => setCount(parseInt(e.target.value))}
-                            onChange={(e) => {
-                                const value = parseInt(e.target.value);
-                                if (value >= -1 || e.target.value === "") {
-                                    setCount(value);
-                                }
-                            }}
+                            onChange={(e) => setCount(parseInt(e.target.value))}
                         />
-                    </MDBCol>
+                    </div>
 
-                    <MDBCol className="col d-flex align-items-center justify-content-center">
-                        <p>
-                            <button className="btn btn-yellow btn-submit" type="submit" onClick={handleSubmit}>Submit</button>
-                        </p>
-                    </MDBCol>
-                </MDBRow>
-
+                    <p>
+                        <button className="btn btn-yellow" type="submit">Submit</button></p>
+                </form>
             </div>
 
 
-            {
-                isVisibleTableScraped &&
+            {isVisibleTableScraped &&
                 <div className="tableContainer" id="scrapeTable">
-                    {tableData.length > 0 ? (
+                    {tableData.length > 0 && (
                         <div>
                             <h2>Rezultate</h2>
                             <table>
@@ -357,21 +336,11 @@ const ScrapeTweets = () => {
                                 </tbody>
                             </table>
                         </div>
-                    ) : (
-                        <h3>
-                            {tableData.length === 0 ? (
-                                "Nu s-au găsit tweet-uri pentru parametrii introduși."
-                            ) : (
-                                "Încă se încarcă..."
-                            )}
-                        </h3>
                     )}
                 </div>
             }
 
-
-            {
-                isVisiblepreviousSearches &&
+            {isVisiblepreviousSearches &&
                 <div id="previousSearches" >
                     <h2><br /><br />Căutări anterioare</h2>
                     <ul>
@@ -410,7 +379,7 @@ const ScrapeTweets = () => {
                                         <tr>
                                             <th>#</th> {/* Adaugă antetul coloanei de index */}
                                             <th>User</th>
-                                            <th>Data</th>
+                                            <th>Date Time</th>
                                             <th>Text</th>
                                             <th>Sentiment</th>
                                         </tr>
@@ -433,72 +402,10 @@ const ScrapeTweets = () => {
                 }
             </div>
 
-            {
-                isVisibleStatistici &&
-
-                <div id="Statistici">
-                    <h2><br /><br />Statistici</h2>
-
-                    {Object.keys(sentimentPerMonth).length > 0 && (
-                        <div>
-                            <h3>Evolutia sentimentului pe luni</h3>
-                            <LineChart width={600} height={300} data={Object.entries(sentimentPerMonth)}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="0" reversed={true} />
-                                <YAxis />
-                                {/* <Tooltip formatter={(value, name, entry) => `${entry.payload[0]}: ${entry.payload[1].toFixed(3)}`} /> */}
-                                {/* <Tooltip labelFormatter={(label) => `${label}:`} formatter={(value) => value.toFixed(3)} /> */}
-                                <Tooltip labelFormatter={(label) => `${label}:`} formatter={(value, name) => [value.toFixed(3)]} />
-                                <Legend />
-                                <Line type="monotone" dataKey="1" stroke="#8884d8" name="Evolutia sentimentului pe luni" />
-                            </LineChart>
-                        </div>
-                    )}
 
 
-                    {Object.keys(sentimentPerMonth).length > 0 && (
-                        <div>
-                            <h3><br />Numarul tweet-urilor pe luni</h3>
-                            <LineChart width={600} height={300} data={Object.entries(tweetsPerMonth)}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="0" reversed={true} />
-                                <YAxis />
-                                {/* <Tooltip formatter={(value, name, entry) => `${entry.payload[0]}: ${entry.payload[1].toFixed(3)}`} /> */}
-                                {/* <Tooltip labelFormatter={(label) => `${label}:`} formatter={(value) => value.toFixed(3)} /> */}
-                                <Tooltip labelFormatter={(label) => `${label}:`} formatter={(value, name) => [value.toFixed(0)]} />
-                                <Legend />
-                                <Line type="monotone" dataKey="1" stroke="#8884d8" name="Numarul tweet-urilor pe luni" />
-                            </LineChart>
-                        </div>
-                    )}
-
-                    <ResponsiveContainer width="100%" height={300}>
-                        <PieChart width={400} height={400}>
-                            <Pie
-                                data={tweetData}
-                                dataKey="count"
-                                nameKey="sentiment"
-                                cx="50%"
-                                cy="50%"
-                                outerRadius={100}
-                                fill="#8884d8"
-                                label={renderLabel}
-                                labelLine={false} // Adăugați această opțiune pentru a elimina linia de conectare a etichetelor
-                            >
-                                {tweetData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                ))}
-                            </Pie>
-                            {/* <Tooltip /> */}
-                            {/* <Legend /> */}
-                        </PieChart>
-                    </ResponsiveContainer>
-                </div>
-            }
-
-
-        </div >
+        </div>
     );
 };
 
-export default ScrapeTweets;
+export default SearchTweets;
