@@ -19,7 +19,14 @@ const LatestNews = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('https://localhost:7112/api/News/NewsFeed');
+      const token = localStorage.getItem('access_token'); // Replace with your actual bearer token
+      const headers = {
+          Authorization: `Bearer ${token}`
+      };
+      const response = await axios.get('https://localhost:7112/api/News/NewsFeed',{
+
+          headers: headers 
+      });
       setNewsContent(response.data);
       setIsVisibleTableNews(true);
 
@@ -62,7 +69,7 @@ const LatestNews = () => {
             <div className="newsTableContainer">
               {newestNews.length > 0 && (
                 <div>
-                  <h2>Today's News</h2>
+                  <h3>Today's News</h3>
                   {newestNews.map((item, index) => (
                     <div className="tweet" key={index}>
                       <div className="tweetHeader">
@@ -83,7 +90,7 @@ const LatestNews = () => {
               {olderNews.length > 0 && (
                 <div>
                   <br /><br /><br />
-                  <h2>Older News</h2>
+                  <h3>Older News</h3>
                   {olderNews.map((item, index) => (
                     <div className="tweet" key={index}>
                       <div className="tweetHeader">

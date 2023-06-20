@@ -5,6 +5,9 @@ const Navbar = () => {
 	return (
 		<>
 			<Nav>
+				<div className="logo">
+					PolitiMood
+				</div>
 				<NavMenu>
 					<NavLink to="/Home" activeStyle>
 						Home

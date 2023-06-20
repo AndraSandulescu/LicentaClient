@@ -38,7 +38,7 @@ body {
     height: fit-content;
     min-height: 100vh;
     /* Modificare: utilizăm min-height pentru a ocupa întreaga înălțime a ecranului */
-    width: 100vw;
+    max-width: 100vw;
 }
 
 
@@ -105,7 +105,7 @@ form {
     background-color: #1e1f2500;
     border-radius: 20px;
     max-height: 400px;
-    padding: 20px 10px 10px 10px;
+    padding: 0px 10px 10px 10px;
     overflow: auto;
 }
 
@@ -118,9 +118,11 @@ table {
 /* Stilizare pentru antetul tabelului */
 thead {
     position: sticky;
-    top: 0px;
+    top: -1px;
     margin: 0 0 0 0;
-    background-color: lightblue;
+    /* background-color: lightblue; */
+    background-color: #002147;
+    color: rgba(255, 255, 255, 0.905);
 }
 
 /* Stilizare pentru celulele antetului */
@@ -158,7 +160,11 @@ form {
 /* latest news twitter feed */
 .newsTableContainer {
     /* background-color: #f5f8fa; */
-    background-color: #e5edf1;
+    /* background-color: #e5edf1; */
+
+    background-color: #002147;
+    color: rgba(255, 255, 255, 0.905);
+    
     padding: 20px;
     border-radius: 8px;
 }
@@ -302,4 +308,11 @@ form {
     position: relative;
     display: inline-block;
     max-width: 230px;
+}
+
+
+.logo{
+    color: #e6b811;
+    font-size: x-large;
+padding-top: 20px;
 }

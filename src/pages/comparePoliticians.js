@@ -50,6 +50,10 @@ const ComparePoliticians = () => {
         { sentiment: 'negativ sau incert', count: totalTweets2 - posTweets2 }
     ];
 
+
+    const [searching1, setSearcing1] = useState(false);
+    const [searching2, setSearcing2] = useState(false);
+
     // const handlePoliticianChange1 = event => {
     //     const selectedPolitician1 = event.target.value;
     //     setSelectedPolitician1(selectedPolitician1);
@@ -95,18 +99,34 @@ const ComparePoliticians = () => {
         const formattedSince = since ? format(since, "yyyy-MM-dd") : "";
         const formattedUntil = until ? format(until, "yyyy-MM-dd") : "";
 
+        const token = localStorage.getItem('access_token'); // Replace with your actual bearer token
+        const headers = {
+            Authorization: `Bearer ${token}`
+        };
+
+
+        setText(text+" ")
+        // console.log(text+text)
+
         const formValues = {
             text,
             formattedSince,
             formattedUntil,
-            politician1: selectedPolitician1,
-            politician2: selectedPolitician2,
+            politician1: selectedPolitician1.value,
+            politician2: selectedPolitician2.value,
         };
         console.log(formValues); // Log the values to the console
 
         // Send the values to the server using Axios and receive response1 and response2
         try {
-            const response = await axios.get('https://localhost:7112/api/ComparePoliticians/Compare', { params: formValues });
+            const response = await axios.get('https://localhost:7112/api/ComparePoliticians/Compare',
+                {
+                    params: formValues,
+                    headers: headers
+                });
+
+            //trb o verificre, daca response.data contine emsaj de eroare -> trateaza diferit (feedback)
+            // sau dezativeaza buton de dinainte
 
             const { response1, response2 } = response.data;
 
@@ -180,7 +200,7 @@ const ComparePoliticians = () => {
                             type="text"
                             id="text"
                             value={text}
-                            onChange={(e) => setText(e.target.value)}
+                            onChange={(e) => setText(e.target.value + ' ')}
                         />
                     </MDBCol>
                     <MDBCol className="col d-flex align-items-center justify-content-center">
@@ -282,7 +302,14 @@ const ComparePoliticians = () => {
 
 
                                 ) : (
-                                    <p>Nu s-au găsit tweet-uri pentru primul politician.</p>
+                                    <h3>
+                                        {(response1.results.length === 0 && searching1 === false) ? (
+                                            "Nu s-au găsit tweet-uri pentru parametrii introduși."
+                                        ) : (
+                                            "Încă se încarcă..."
+                                        )}
+
+                                    </h3>
                                 )}
 
 
@@ -296,28 +323,38 @@ const ComparePoliticians = () => {
                         {response2.results && (
                             <div>
                                 <h2>Tweet-uri pentru al doilea politician</h2>
-                                <div className="tableContainer">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Data</th>
-                                                <th>Text</th>
-                                                <th>Sentiment</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {response2.results.map((item, index) => (
-                                                <tr key={index}>
-                                                    <td>{index + 1}</td>
-                                                    <td>{format(new Date(item.searchCsv.dateTime), "yyyy-MM-dd")}</td>
-                                                    <td>{item.searchCsv.text}</td>
-                                                    <td>{item.sentiment}</td>
+                                {response2.results.length > 0 ? (
+                                    <div className="tableContainer">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Data</th>
+                                                    <th>Text</th>
+                                                    <th>Sentiment</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                            </thead>
+                                            <tbody>
+                                                {response2.results.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{index + 1}</td>
+                                                        <td>{format(new Date(item.searchCsv.dateTime), "yyyy-MM-dd")}</td>
+                                                        <td>{item.searchCsv.text}</td>
+                                                        <td>{item.sentiment}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : (
+                                    <h3>
+                                        {response2.results.length === 0 && searching2 === false ? (
+                                            "Nu s-au găsit tweet-uri pentru parametrii introduși."
+                                        ) : (
+                                            "Încă se încarcă..."
+                                        )}
+                                    </h3>
+                                )}
                             </div>
                         )}
                     </div>

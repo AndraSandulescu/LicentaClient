@@ -41,6 +41,7 @@ const ScrapeTweets = () => {
 
     //tabel cautare curenta
     const [tableData, setTableData] = useState([]);
+    const [searching, setSearching] = useState(false);
 
     //raspuns de la ModelScript
     //tabel analiza sentiment corespondent SentimentCSV
@@ -87,6 +88,9 @@ const ScrapeTweets = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        setTableData([]);
+        setSearching(true);
+
         setIsVisibleTableScraped(true);
 
         try {
@@ -102,6 +106,12 @@ const ScrapeTweets = () => {
                 replies,
                 count,
                 userId)
+
+            const token = localStorage.getItem('access_token'); // Replace with your actual bearer token
+            const headers = {
+                Authorization: `Bearer ${token}`
+            };
+
             const response = await axios.get("https://localhost:7112/api/Search/SearchScript", {
                 params: {
                     text,
@@ -113,7 +123,10 @@ const ScrapeTweets = () => {
                     count,
                     // userId
                 },
+                headers: headers // Add the headers containing the bearer token
             });
+
+            setSearching(false);
 
             console.log("raspuns")
             console.log(response.data); // Handle the response data as per your requirements
@@ -154,15 +167,22 @@ const ScrapeTweets = () => {
             selectedIndex = previousSearches[previousSearches.length - 1].searchIndex;
         }
 
+
+
         setIsVisibleSentTable(true);
 
         if (selectedIndex !== null) {
             try {
                 console.log(selectedIndex);
+                const token = localStorage.getItem('access_token'); // Replace with your actual bearer token
+                const headers = {
+                    Authorization: `Bearer ${token}`
+                };
                 const response = await axios.get("https://localhost:7112/api/Search/ModelScript", {
                     params: {
                         index: selectedIndex,
                     },
+                    headers: headers
                 });
 
                 //primesc: list sentimentCSV-> searchCSV-DateTime,tweetID.....QuoteCount>;Sentiment;Value(coloane)
@@ -328,38 +348,40 @@ const ScrapeTweets = () => {
 
             {
                 isVisibleTableScraped &&
-                <div className="tableContainer" id="scrapeTable">
+                <div id="scrapeTable">
                     {tableData.length > 0 ? (
                         <div>
                             <h2>Rezultate</h2>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>#</th> {/* Adaugă antetul coloanei de index */}
-                                        <th>User</th>
-                                        <th>Date Time</th>
-                                        {/* <th>Tweet ID</th> */}
-                                        <th>Text</th>
-                                        {/* Adaugă aici alte coloane dorite */}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {tableData.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{index + 1}</td> {/* Adaugă valoarea de index în fiecare rând */}
-                                            <td>{item.username}</td>
-                                            <td>{format(new Date(item.dateTime), "yyyy-MM-dd")}</td>
-                                            {/* <td>{item.tweetId}</td> */}
-                                            <td>{item.text}</td>
-                                            {/* Adaugă aici alte celule dorite */}
+                            <div className="tableContainer">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>#</th> {/* Adaugă antetul coloanei de index */}
+                                            <th>User</th>
+                                            <th>Date Time</th>
+                                            {/* <th>Tweet ID</th> */}
+                                            <th>Text</th>
+                                            {/* Adaugă aici alte coloane dorite */}
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {tableData.map((item, index) => (
+                                            <tr key={index}>
+                                                <td>{index + 1}</td> {/* Adaugă valoarea de index în fiecare rând */}
+                                                <td>{item.username}</td>
+                                                <td>{format(new Date(item.dateTime), "yyyy-MM-dd")}</td>
+                                                {/* <td>{item.tweetId}</td> */}
+                                                <td>{item.text}</td>
+                                                {/* Adaugă aici alte celule dorite */}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     ) : (
                         <h3>
-                            {tableData.length === 0 ? (
+                            {(tableData.length === 0 && searching === false) ? (
                                 "Nu s-au găsit tweet-uri pentru parametrii introduși."
                             ) : (
                                 "Încă se încarcă..."
