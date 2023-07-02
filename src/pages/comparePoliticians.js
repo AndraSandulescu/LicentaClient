@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react';
+import React, { Component, useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import DatePicker from "react-datepicker";
 import { format } from "date-fns";
@@ -7,6 +7,11 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart
 import Select from 'react-select';
 import "./comparePoliticians.css"
 import './centralizedStyling.css';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowUp } from '@fortawesome/free-solid-svg-icons';
+
+import LoadingBar from 'react-top-loading-bar';
 
 const ComparePoliticians = () => {
 
@@ -17,7 +22,6 @@ const ComparePoliticians = () => {
 
     const [response1, setResponse1] = useState({});
     const [response2, setResponse2] = useState({});
-
 
 
     const [text, setText] = useState('');
@@ -35,10 +39,9 @@ const ComparePoliticians = () => {
     const [sentimentPerMonth1, setSentimentPerMonth1] = useState({});
     const [tweetsPerMonth1, setTweetsPerMonth1] = useState({});
     const tweetData1 = [
-        { sentiment: 'pozitiv', count: posTweets1 },
-        { sentiment: 'negativ sau incert', count: totalTweets1 - posTweets1 }
+        { sentiment: 'positive', count: posTweets1 },
+        { sentiment: 'negative or uncertain', count: totalTweets1 - posTweets1 }
     ];
-
 
     const [posTweets2, setPosTweets2] = useState(0);
     const [totalTweets2, setTotalTweets2] = useState(0);
@@ -46,22 +49,41 @@ const ComparePoliticians = () => {
     const [sentimentPerMonth2, setSentimentPerMonth2] = useState({});
     const [tweetsPerMonth2, setTweetsPerMonth2] = useState({});
     const tweetData2 = [
-        { sentiment: 'pozitiv', count: posTweets2 },
-        { sentiment: 'negativ sau incert', count: totalTweets2 - posTweets2 }
+        { sentiment: 'positive', count: posTweets2 },
+        { sentiment: 'negative or uncertain', count: totalTweets2 - posTweets2 }
     ];
 
 
-    const [searching1, setSearcing1] = useState(false);
-    const [searching2, setSearcing2] = useState(false);
+    const [searching1, setSearching1] = useState(false);
+    const [searching2, setSearching2] = useState(false);
 
-    // const handlePoliticianChange1 = event => {
-    //     const selectedPolitician1 = event.target.value;
-    //     setSelectedPolitician1(selectedPolitician1);
-    // };
-    // const handlePoliticianChange2 = event => {
-    //     const selectedPolitician2 = event.target.value;
-    //     setSelectedPolitician2(selectedPolitician2);
-    // };
+    const [showScrollButton, setShowScrollButton] = useState(false);
+
+    const loadingBarRef = useRef(null);
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
+    const handleScroll = () => {
+        if (window.pageYOffset > 300) {
+            setShowScrollButton(true);
+        } else {
+            setShowScrollButton(false);
+        }
+    };
+
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
+
+
 
     const handlePoliticianChange1 = selectedOption => {
         setSelectedPolitician1(selectedOption);
@@ -70,8 +92,6 @@ const ComparePoliticians = () => {
     const handlePoliticianChange2 = selectedOption => {
         setSelectedPolitician2(selectedOption);
     };
-
-
 
     const politiciansList = [
         { id: 0, name: 'Alexandria Ocasio-Cortez' },
@@ -96,6 +116,15 @@ const ComparePoliticians = () => {
     const handleSubmit = async event => {
         event.preventDefault(); // Prevent page reload
         // Get the values
+
+        setResponse1({});
+        setSearching1(true);
+
+        setResponse2({});
+        setSearching2(true);
+
+        setIsVisibleStatistics(false)
+
         const formattedSince = since ? format(since, "yyyy-MM-dd") : "";
         const formattedUntil = until ? format(until, "yyyy-MM-dd") : "";
 
@@ -105,11 +134,8 @@ const ComparePoliticians = () => {
         };
 
 
-        setText(text+" ")
-        // console.log(text+text)
-
         const formValues = {
-            text,
+            text: text.trim(),
             formattedSince,
             formattedUntil,
             politician1: selectedPolitician1.value,
@@ -119,6 +145,7 @@ const ComparePoliticians = () => {
 
         // Send the values to the server using Axios and receive response1 and response2
         try {
+            loadingBarRef.current?.continuousStart();
             const response = await axios.get('https://localhost:7112/api/ComparePoliticians/Compare',
                 {
                     params: formValues,
@@ -128,47 +155,105 @@ const ComparePoliticians = () => {
             //trb o verificre, daca response.data contine emsaj de eroare -> trateaza diferit (feedback)
             // sau dezativeaza buton de dinainte
 
+            setSearching1(false);
+            setSearching2(false);
+
+            // console.log("raspuns:")
+            // console.log(response.data);
+            // console.log("raspuns1.results:")
+            // console.log(response.data.response1.results)
+            // console.log("raspuns1.results.length:")
+            // console.log(response.data.response1.results.length)
+
+
             const { response1, response2 } = response.data;
 
-            console.log(response)
+            // console.log("ceva:")
+            // console.log(response1)
+            // console.log(response2)
 
-            setResponse1(response1); // Update the state for politician 1 response
-            setResponse2(response2); // Update the state for politician 2 response
+            console.log("altceva:")
+            console.log(response.data.response2.results)
+            console.log(response.data.response2.results.length)
+
+            if (response.data.response1.results && response.data.response1.results.length > 0) {
+                // setTableData(response.data.results);
+                setResponse1(response.data.response1)
+            } else {
+                setResponse1({}); // sau o valoare implicită pentru tableData când nu există rezultate
+            }
 
 
+            if (response.data.response2.results && response.data.response2.results.length > 0) {
+                // setTableData(response.data.results);
+                console.log("am facut set aici")
+                setResponse2(response.data.response2)
+            } else {
 
-            console.log("raspuns1")
-            console.log(response1)
+                setResponse2({}); // sau o valoare implicită pentru tableData când nu există rezultate
+                console.log("setResponse2 gol")
+                console.log(response2);
+            }
 
 
-            setPosTweets1(response1.posTweets); // Actualizează starea cu numărul de tweet-uri pozitive
+            // console.log("AICI:")
+            // console.log("response2:")
+            // console.log(response2)
+
+            // console.log("response.data.response2:")
+            // console.log(response.data.response2)
+
+
+            // console.log(response.data.response1.results) //array ul efectiv de intrari din csv
+
+            // console.log("trecut")
+
+            // setResponse1(response1); // Update the state for politician 1 response
+            // setResponse2(response2); // Update the state for politician 2 response
+
+            // console.log("trecut1")
+
+            // console.log("raspuns1")
+            // console.log(response1)
+
+            setPosTweets1(response1.posTweets); // Actualizează starea cu numărul de tweet-uri positivee
             setTotalTweets1(response1.totalTweets); // Actualizează starea cu numărul total de tweet-uri
             setSentimentPerMonth1(response1.sentimentPerMonth); // Actualizează starea cu dicționarul SentimentPerMonth
-            console.log("sentimentPerMonth1")
-            console.log(sentimentPerMonth1)
+            // console.log("sentimentPerMonth1")
+            // console.log(sentimentPerMonth1)
 
             setTweetsPerMonth1(response1.tweetsPerMonth); // Actualizează starea cu dicționarul TweetsPerMonth
-            console.log("tweetsPerMonth1")
-            console.log(tweetsPerMonth1)
+            // console.log("tweetsPerMonth1")
+            // console.log(tweetsPerMonth1)
 
 
             /////////////////////////
-            setPosTweets2(response2.posTweets); // Actualizează starea cu numărul de tweet-uri pozitive
+            setPosTweets2(response2.posTweets); // Actualizează starea cu numărul de tweet-uri positivee
             setTotalTweets2(response2.totalTweets); // Actualizează starea cu numărul total de tweet-uri
             setSentimentPerMonth2(response2.sentimentPerMonth); // Actualizează starea cu dicționarul SentimentPerMonth
-            console.log("sentimentPerMonth2")
-            console.log(sentimentPerMonth2)
+            // console.log("sentimentPerMonth2")
+            // console.log(sentimentPerMonth2)
 
             setTweetsPerMonth2(response2.tweetsPerMonth); // Actualizează starea cu dicționarul TweetsPerMonth
-            console.log("tweetsPerMonth2")
-            console.log(tweetsPerMonth2)
+            // console.log("tweetsPerMonth2")
+            // console.log(tweetsPerMonth2)
+            // console.log("trecut2")
+
 
             setIsVisibleStatistics(true)
 
-            console.log(response.data)
+            // console.log(response.data)
+
+            // console.log("trecut3")
+
+            console.log("sfarsit:")
+            console.log(response2)
+            console.log(response2.results.length)
 
         } catch (error) {
             console.error(error); // Log the error to the console in case of failure
+        } finally {
+            loadingBarRef.current?.complete();
         }
 
 
@@ -178,7 +263,7 @@ const ComparePoliticians = () => {
     };
 
     const renderLabel = ({ sentiment, count }) => {
-        if (sentiment === 'pozitiv') {
+        if (sentiment === 'positive') {
             return `${sentiment}: ${count}`;
         }
         else {
@@ -190,21 +275,22 @@ const ComparePoliticians = () => {
 
     return (
         <div className="entirePage" id="root">
-            <h1> Comparati opiniile politice </h1><br /><br /><br /><br />
+            <LoadingBar className='loadingBar' ref={loadingBarRef} color='#e6b811' height={4} />
+            <h1> Compare political opinions </h1><br /><br /><br /><br />
             <div className="topOfPage">
 
                 <MDBRow>
                     <MDBCol className="col d-flex align-items-center justify-content-center">
-                        <label className="formLabel" htmlFor="text">Text de cautat:</label>
+                        <label className="formLabel" htmlFor="text">Searched text:</label>
                         <input className='formControl'
                             type="text"
                             id="text"
                             value={text}
-                            onChange={(e) => setText(e.target.value + ' ')}
+                            onChange={(e) => setText(e.target.value)}
                         />
                     </MDBCol>
                     <MDBCol className="col d-flex align-items-center justify-content-center">
-                        <label className="formLabel" htmlFor="since">De la data:</label>
+                        <label className="formLabel" htmlFor="since">Since:</label>
                         <DatePicker
                             className='formControl'
                             id="since"
@@ -215,7 +301,7 @@ const ComparePoliticians = () => {
                         />
                     </MDBCol>
                     <MDBCol className="col d-flex align-items-center justify-content-center">
-                        <label className="formLabel" htmlFor="until">Pana la data:</label>
+                        <label className="formLabel" htmlFor="until">Until:</label>
                         <DatePicker
                             className='formControl'
                             id="until"
@@ -226,7 +312,14 @@ const ComparePoliticians = () => {
                         />
                     </MDBCol>
                     <MDBCol className="col d-flex align-items-center justify-content-center">
-                        <button className="btn btn-yellow btn-compare" type="submit" onClick={handleSubmit}>Submit</button>
+                        <button
+                            className="btn btn-yellow btn-compare"
+                            type="submit"
+                            onClick={handleSubmit}
+                            disabled={!selectedPolitician1 || !selectedPolitician2 || !text}
+                        >
+                            Submit
+                        </button>
                     </MDBCol>
                 </MDBRow>
                 {/* </form>F */}
@@ -273,9 +366,9 @@ const ComparePoliticians = () => {
                 <MDBCol className="col d-flex align-items-top justify-content-center">
                     <div className="table-responsive">
                         {/* Tabelul pentru politicianul 1 */}
-                        {response1.results && (
+                        {/* {response1.results && (
                             <div>
-                                <h2>Tweet-uri pentru primul politician</h2>
+                                <h2>First Politician's Tweets </h2>
                                 {response1.results.length > 0 ? (
                                     <div className="tableContainer">
                                         <table>
@@ -304,9 +397,9 @@ const ComparePoliticians = () => {
                                 ) : (
                                     <h3>
                                         {(response1.results.length === 0 && searching1 === false) ? (
-                                            "Nu s-au găsit tweet-uri pentru parametrii introduși."
+                                            "We haven't found any posts."
                                         ) : (
-                                            "Încă se încarcă..."
+                                            "Loading..."
                                         )}
 
                                     </h3>
@@ -314,15 +407,57 @@ const ComparePoliticians = () => {
 
 
                             </div>
+                        )} */}
+
+                        {response1.results && (
+                            <div>
+                                <h2>First Politician's Tweets </h2>
+                                {response1.results.length > 0 ? (
+                                    <div className="tableContainer">
+                                        {/* Tabelul pentru politicianul 1 */}
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Data</th>
+                                                    <th>Text</th>
+                                                    <th>Sentiment</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {response1.results.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{index + 1}</td>
+                                                        <td>{format(new Date(item.searchCsv.dateTime), "yyyy-MM-dd")}</td>
+                                                        <td>{item.searchCsv.text}</td>
+                                                        <td>{item.sentiment}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : (
+                                    <h3>
+                                        {searching1 === false ? (
+                                            "We haven't found any posts."
+                                        ) : (
+                                            "Loading..."
+                                        )}
+                                    </h3>
+                                )}
+                            </div>
                         )}
+
+
+
                     </div>
                 </MDBCol>
                 <MDBCol className="col d-flex align-items-top justify-content-center">
                     <div className="table-responsive">
                         {/* Tabelul pentru politicianul 2 */}
-                        {response2.results && (
+                        {/* {response2.results && (
                             <div>
-                                <h2>Tweet-uri pentru al doilea politician</h2>
+                                <h2>Second Politician's Tweets</h2>
                                 {response2.results.length > 0 ? (
                                     <div className="tableContainer">
                                         <table>
@@ -349,14 +484,56 @@ const ComparePoliticians = () => {
                                 ) : (
                                     <h3>
                                         {response2.results.length === 0 && searching2 === false ? (
-                                            "Nu s-au găsit tweet-uri pentru parametrii introduși."
+                                            "We haven't found any posts."
                                         ) : (
-                                            "Încă se încarcă..."
+                                            "Loading..."
+                                        )}
+                                    </h3>
+                                )}
+                            </div>
+                        )} */}
+
+
+                        {response1.results && (
+                            <div>
+                                <h2>First Politician's Tweets </h2>
+                                {response1.results.length > 0 ? (
+                                    <div className="tableContainer">
+                                        {/* Tabelul pentru politicianul 1 */}
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Data</th>
+                                                    <th>Text</th>
+                                                    <th>Sentiment</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {response2.results.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{index + 1}</td>
+                                                        <td>{format(new Date(item.searchCsv.dateTime), "yyyy-MM-dd")}</td>
+                                                        <td>{item.searchCsv.text}</td>
+                                                        <td>{item.sentiment}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : (
+                                    <h3>
+                                        {searching1 === false ? (
+                                            "We haven't found any posts."
+                                        ) : (
+                                            "Loading..."
                                         )}
                                     </h3>
                                 )}
                             </div>
                         )}
+
+
                     </div>
                 </MDBCol>
             </MDBRow>
@@ -366,7 +543,7 @@ const ComparePoliticians = () => {
                     <div className='statisticsContainer'>
                         <MDBCol>
                             <br /><br /><br />
-                            <h3>Statistici:</h3>
+                            <h3>Statistics:</h3>
 
                             <ResponsiveContainer width="100%" height={300}>
                                 <PieChart width={400} height={400}>
@@ -392,7 +569,7 @@ const ComparePoliticians = () => {
 
                             {Object.keys(sentimentPerMonth1).length > 0 && (
                                 <div>
-                                    <br /><br /><h4>Evolutia sentimentului pe luni</h4><br />
+                                    <br /><br /><h4>The evolution of sentiment by month</h4><br />
                                     <ResponsiveContainer width="100%" height={300}>
                                         <LineChart data={Object.entries(sentimentPerMonth1)}
                                             margin={{ top: 10, right: 70, left: 70, bottom: 10 }}>
@@ -403,7 +580,7 @@ const ComparePoliticians = () => {
                                             {/* <Tooltip labelFormatter={(label) => `${label}:`} formatter={(value) => value.toFixed(3)} /> */}
                                             <Tooltip labelFormatter={(label) => `${label}:`} formatter={(value, name) => [value.toFixed(3)]} />
                                             <Legend />
-                                            <Line type="monotone" dataKey="1" stroke="#8884d8" name="Evolutia sentimentului pe luni" />
+                                            <Line type="monotone" dataKey="1" stroke="#8884d8" name="The evolution of sentiment by month" />
                                         </LineChart>
 
                                     </ResponsiveContainer>
@@ -413,7 +590,7 @@ const ComparePoliticians = () => {
 
                             {Object.keys(sentimentPerMonth1).length > 0 && (
                                 <div>
-                                    <br /><br /><h4><br />Numarul tweet-urilor pe luni</h4><br />
+                                    <br /><br /><h4><br />Number of Tweets by month</h4><br />
                                     <ResponsiveContainer width="100%" height={300}>
                                         <LineChart width={600} height={300} data={Object.entries(tweetsPerMonth1)}
                                             margin={{ top: 10, right: 70, left: 70, bottom: 10 }}>
@@ -424,7 +601,7 @@ const ComparePoliticians = () => {
                                             {/* <Tooltip labelFormatter={(label) => `${label}:`} formatter={(value) => value.toFixed(3)} /> */}
                                             <Tooltip labelFormatter={(label) => `${label}:`} formatter={(value, name) => [value.toFixed(0)]} />
                                             <Legend />
-                                            <Line type="monotone" dataKey="1" stroke="#8884d8" name="Numarul tweet-urilor pe luni" />
+                                            <Line type="monotone" dataKey="1" stroke="#8884d8" name="Number of Tweets by month" />
                                         </LineChart>
                                     </ResponsiveContainer>
                                 </div>
@@ -437,7 +614,7 @@ const ComparePoliticians = () => {
                     <div className='statisticsContainer'>
                         <MDBCol>
                             <br /><br /><br />
-                            <h3>Statistici:</h3>
+                            <h3>Statistics:</h3>
 
                             <ResponsiveContainer width="100%" height={300}>
                                 <PieChart width={400} height={400}>
@@ -463,7 +640,7 @@ const ComparePoliticians = () => {
 
                             {Object.keys(sentimentPerMonth2).length > 0 && (
                                 <div>
-                                    <br /><br /><h4>Evolutia sentimentului pe luni</h4><br />
+                                    <br /><br /><h4>The evolution of sentiment by month</h4><br />
                                     <ResponsiveContainer width="100%" height={300}>
                                         <LineChart width={600} height={300} data={Object.entries(sentimentPerMonth2)}
                                             margin={{ top: 10, right: 70, left: 70, bottom: 10 }}>
@@ -474,7 +651,7 @@ const ComparePoliticians = () => {
                                             {/* <Tooltip labelFormatter={(label) => `${label}:`} formatter={(value) => value.toFixed(3)} /> */}
                                             <Tooltip labelFormatter={(label) => `${label}:`} formatter={(value, name) => [value.toFixed(3)]} />
                                             <Legend />
-                                            <Line type="monotone" dataKey="1" stroke="#8884d8" name="Evolutia sentimentului pe luni" />
+                                            <Line type="monotone" dataKey="1" stroke="#8884d8" name="The evolution of sentiment by month" />
                                         </LineChart>
                                     </ResponsiveContainer>
                                 </div>
@@ -483,7 +660,7 @@ const ComparePoliticians = () => {
 
                             {Object.keys(sentimentPerMonth2).length > 0 && (
                                 <div>
-                                    <br /><br /><h4><br />Numarul tweet-urilor pe luni</h4><br />
+                                    <br /><br /><h4><br />Number of Tweets by month</h4><br />
                                     <ResponsiveContainer width="100%" height={300}>
                                         <LineChart width={600} height={300} data={Object.entries(tweetsPerMonth2)}
                                             margin={{ top: 10, right: 70, left: 70, bottom: 10 }}>
@@ -494,7 +671,7 @@ const ComparePoliticians = () => {
                                             {/* <Tooltip labelFormatter={(label) => `${label}:`} formatter={(value) => value.toFixed(3)} /> */}
                                             <Tooltip labelFormatter={(label) => `${label}:`} formatter={(value, name) => [value.toFixed(0)]} />
                                             <Legend />
-                                            <Line type="monotone" dataKey="1" stroke="#8884d8" name="Numarul tweet-urilor pe luni" />
+                                            <Line type="monotone" dataKey="1" stroke="#8884d8" name="Number of Tweets by month" />
                                         </LineChart>
                                     </ResponsiveContainer>
                                 </div>
@@ -505,6 +682,13 @@ const ComparePoliticians = () => {
                     </div>
                 </MDBRow>
             }
+
+            {showScrollButton && (
+                <button className="scrollButton" onClick={scrollToTop}>
+                    <FontAwesomeIcon icon={faArrowUp} />
+                </button>
+            )}
+
         </div>
     );
 

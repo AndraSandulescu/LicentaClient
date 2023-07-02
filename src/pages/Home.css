@@ -1,5 +1,6 @@
 .homePage {
-    padding-top: 80px;
+    padding-top: 50px;
+    height: 90vh;
 }
 
 .chenarContinut {
@@ -56,6 +57,12 @@ h3 {
     color: #002147;
 }
 
+.btn-login.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  
 
 .col {
     /* display: grid; */

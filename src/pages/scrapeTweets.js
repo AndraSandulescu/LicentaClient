@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import './centralizedStyling.css';
 import axios from "axios";
 import DatePicker from "react-datepicker";
@@ -8,11 +8,11 @@ import { format } from "date-fns";
 import { MDBRow, MDBCol } from 'mdb-react-ui-kit';
 import Select from 'react-select'
 
-import Sidebar from '../components/Sidebar'
-import { slide as Menu } from 'react-burger-menu';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
+import LoadingBar from 'react-top-loading-bar';
 
 const ScrapeTweets = () => {
     const rootElement = document.getElementById("root");
@@ -53,6 +53,9 @@ const ScrapeTweets = () => {
     const [sentimentPerMonth, setSentimentPerMonth] = useState({});
     const [tweetsPerMonth, setTweetsPerMonth] = useState({});
     const [tweetSentiments, setTweetSentiments] = useState([]);
+    const [showScrollButton, setShowScrollButton] = useState(false);
+
+    const loadingBarRef = useRef(null);
 
     const tweetData = [
         { sentiment: 'pozitiv', count: posTweets },
@@ -70,20 +73,27 @@ const ScrapeTweets = () => {
     ]
 
 
-    // const RADIAN = Math.PI / 180;
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
 
+    const handleScroll = () => {
+        if (window.pageYOffset > 300) {
+            setShowScrollButton(true);
+        } else {
+            setShowScrollButton(false);
+        }
+    };
 
-    //sidebar
-    // const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    // const openSidebar = () => {
-    //     setIsSidebarOpen(true);
-    // };
-
-    // // Exemplu de cod pentru a închide sidebar-ul
-    // const closeSidebar = () => {
-    //     rootElement.
-    //         setIsSidebarOpen(false);
-    // };
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -94,6 +104,8 @@ const ScrapeTweets = () => {
         setIsVisibleTableScraped(true);
 
         try {
+            loadingBarRef.current?.continuousStart();
+
             const userId = localStorage.getItem('user_id');
 
             const formattedSince = since ? format(since, "yyyy-MM-dd") : "";
@@ -157,6 +169,8 @@ const ScrapeTweets = () => {
 
         } catch (error) {
             console.error(error);
+        } finally {
+            loadingBarRef.current?.complete();
         }
 
     };
@@ -173,6 +187,8 @@ const ScrapeTweets = () => {
 
         if (selectedIndex !== null) {
             try {
+                loadingBarRef.current?.continuousStart();
+
                 console.log(selectedIndex);
                 const token = localStorage.getItem('access_token'); // Replace with your actual bearer token
                 const headers = {
@@ -216,7 +232,10 @@ const ScrapeTweets = () => {
 
             } catch (error) {
                 console.error(error);
+            } finally {
+                loadingBarRef.current?.complete();
             }
+
         } else {
             console.log("Niciun search selectat");
         }
@@ -243,7 +262,7 @@ const ScrapeTweets = () => {
     return (
 
         <div className="entirePage" id="root">
-
+            <LoadingBar className='loadingBar' ref={loadingBarRef} color='#e6b811' height={4} />
 
             <h1>Scrape Tweets</h1><br /><br /><br />
 
@@ -517,6 +536,12 @@ const ScrapeTweets = () => {
                     </ResponsiveContainer>
                 </div>
             }
+
+            {showScrollButton && (
+                <button className="scrollButton" onClick={scrollToTop}>
+                    <FontAwesomeIcon icon={faArrowUp} />
+                </button>
+            )}
 
 
         </div >

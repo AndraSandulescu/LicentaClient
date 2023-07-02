@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
-// import { format, isSameDay } from "date-fns";
 import { MDBRow, MDBCol } from 'mdb-react-ui-kit';
 import './centralizedStyling.css';
 import { useNavigate } from 'react-router-dom';
+import LoadingBar from 'react-top-loading-bar';
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -11,57 +11,69 @@ const SignUp = () => {
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-
   const [signUpUsername, setSignUpUsername] = useState('');
   const [signUpPassword, setSignUpPassword] = useState('');
 
-  const handleLogin = () => {
-    const data = {
-      nickname: username,
-      password: password
-    };
+  const loadingBarRef = useRef(null);
 
-    axios.post('https://localhost:7112/api/Login', data)
-      .then(response => {
-        console.log(response.data);
-        localStorage.setItem('access_token', response.data.token);
-        localStorage.setItem('user_id', response.data.user_id);
-        setIsAuthenticated(true);
-        navigate('/LatestNews'); // Redirecționează utilizatorul la pagina LatestNews
-      })
-      .catch(error => {
-        console.error(error);
-        setErrorMessage('Utilizatorul nu a fost găsit');
-      });
+  const handleLogin = async () => {
+    try {
+      loadingBarRef.current?.continuousStart();
+
+      const data = {
+        nickname: username,
+        password: password
+      };
+
+      const response = await axios.post('https://localhost:7112/api/Login', data);
+      console.log(response.data);
+      localStorage.setItem('access_token', response.data.token);
+      localStorage.setItem('user_id', response.data.user_id);
+      setIsAuthenticated(true);
+
+      setTimeout(() => {
+        navigate('/LatestNews');
+      }, 1000);
+      // navigate('/LatestNews');
+
+    } catch (error) {
+      console.error(error);
+      setErrorMessage('Utilizatorul nu a fost găsit');
+    } finally {
+      loadingBarRef.current?.complete();
+    }
   };
 
+  const handleSignUp = async () => {
+    try {
+      loadingBarRef.current?.continuousStart();
 
+      const data = {
+        nickname: signUpUsername,
+        password: signUpPassword
+      };
 
+      const response = await axios.post('https://localhost:7112/api/Login/Register', data);
+      console.log(response.data);
+      setIsAuthenticated(true);
 
-  const handleSignUp = () => {
-    const data = {
-      nickname: signUpUsername,
-      password: signUpPassword
-    };
-
-    axios.post('https://localhost:7112/api/Login/Register', data)
-      .then(response => {
-        console.log(response.data);
-        setIsAuthenticated(true);
-        // Poți adăuga logica de redirecționare aici
-      })
-      .catch(error => {
-        console.error(error);
-        setErrorMessage('A apărut o eroare la înregistrare');
-      });
+      setTimeout(() => {
+        navigate('/LatestNews');
+      }, 700);
+      
+    } catch (error) {
+      console.error(error);
+      setErrorMessage('A apărut o eroare la înregistrare');
+    } finally {
+      loadingBarRef.current?.complete();
+    }
   };
-
-
-
 
 
   return (
     <div>
+      <LoadingBar className='loadingBar' ref={loadingBarRef} color='#e6b811' height={4} />
+
       <div className="centralizeContainer">
         <div className="chenarContinutSignUp">
           <MDBRow d-flex align-items-center justify-content-center>
@@ -83,9 +95,14 @@ const SignUp = () => {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
               /><br />
-              <button className="btn-login" onClick={handleLogin}>
+
+              <button
+                className={`btn-login`}
+                onClick={handleLogin}
+              >
                 Log In
               </button>
+
               {errorMessage && <p>{errorMessage}</p>}
             </MDBCol>
             <MDBCol className="col align-items-center justify-content-center centrat">
@@ -107,9 +124,14 @@ const SignUp = () => {
                 onChange={e => setSignUpPassword(e.target.value)}
               />
               <br />
-              <button className="btn-login" onClick={handleSignUp}>
+
+              <button
+                className={`btn-login`}
+                onClick={handleSignUp}
+              >
                 Sign Up
               </button>
+
             </MDBCol>
           </MDBRow>
         </div>

@@ -1,6 +1,17 @@
 /* fonturi */
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap');
 
+.fJqHft {
+    margin-left: -300px;
+    padding-right: 100px;
+    justify-content: flex-start;
+}
+
+.loadingBar{
+    color: #e6b811;
+    height:3
+}
+
 h1,
 h2,
 h3 {
@@ -101,6 +112,44 @@ form {
     width: 230px;
 }
 
+.scrollButton {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #002147;
+    color: #f5c411;
+    border: 3px solid #d3a80f;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.scrollButton:hover {
+    background-color: #e6b811;
+    color: #002147;
+}
+
+.btn[disabled] {
+    opacity: 0.6;
+    background-color: grey;
+    /* Reducerea opacității butonului dezactivat */
+    cursor: not-allowed;
+    /* Modificarea cursorului la "not-allowed" */
+}
+
+.btn[disabled]:hover,
+.btn[disabled]:active,
+.btn[disabled]:focus {
+    /* Stiluri pentru starea hover/active/focus a butonului dezactivat */
+    background: none;
+    color: #ccc;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+/* tabele tables */
+
 .tableContainer {
     background-color: #1e1f2500;
     border-radius: 20px;
@@ -164,7 +213,7 @@ form {
 
     background-color: #002147;
     color: rgba(255, 255, 255, 0.905);
-    
+
     padding: 20px;
     border-radius: 8px;
 }
@@ -255,6 +304,7 @@ form {
     width: 200px;
     padding: 20px;
     font-size: 20px;
+    text-align: end;
 }
 
 .formControl {
@@ -311,8 +361,44 @@ form {
 }
 
 
-.logo{
+.logo {
     color: #e6b811;
     font-size: x-large;
-padding-top: 20px;
+    padding-right: 60px;
+    /* margin-left: -100px; */
+
+}
+
+.navigationBar {
+    background: #001731;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 85px;
+    z-index: 12;
+}
+
+nav.navigationBar.container {
+    margin-left: unset;
+}
+
+a:hover {
+    color: #f2b407;
+    text-decoration: underline;
+}
+
+
+.navbar-light .navbar-toggler {
+    color: rgba(0, 0, 0, .5);
+    border-color: rgba(0, 0, 0, .1);
+    background-color: white;
+}
+
+a {
+    color: white;
+}
+
+.navigationBar.navbar.navbar-expand-lg.navbar-light.div.container {
+    margin-left: unset;
 }

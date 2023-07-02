@@ -1,31 +1,35 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { format, isSameDay } from "date-fns";
 import { MDBRow, MDBCol } from 'mdb-react-ui-kit';
 import "./centralizedStyling.css"
 
-const LatestNews = () => {
-  // const [newsContent, setNewsContent] = useState([]);
-  const [newsContent, setNewsContent] = useState({ results: [], topSubjects: [] });
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowUp } from '@fortawesome/free-solid-svg-icons';
 
+const LatestNews = () => {
+  const [newsContent, setNewsContent] = useState({ results: [], topSubjects: [] });
   const [isVisibleTableNews, setIsVisibleTableNews] = useState(false);
   const [newestNews, setNewestNews] = useState([]);
   const [olderNews, setOlderNews] = useState([]);
+  const [showScrollButton, setShowScrollButton] = useState(false);
 
   useEffect(() => {
     fetchData();
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('access_token'); // Replace with your actual bearer token
       const headers = {
-          Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`
       };
-      const response = await axios.get('https://localhost:7112/api/News/NewsFeed',{
-
-          headers: headers 
+      const response = await axios.get('https://localhost:7112/api/News/NewsFeed', {
+        headers: headers
       });
       setNewsContent(response.data);
       setIsVisibleTableNews(true);
@@ -36,18 +40,31 @@ const LatestNews = () => {
 
       setNewestNews(lastDayNews);
       setOlderNews(olderDayNews);
-
-      // console.log("Newest News", newestNews);
-      // console.log("Older News", olderNews);
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleScroll = () => {
+    if (window.pageYOffset > 300) {
+      setShowScrollButton(true);
+    } else {
+      setShowScrollButton(false);
+    }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 
   return (
     <div className='entirePage'>
       <h1>Latest News</h1>
       <br /><br /><br /><br />
+
       <MDBRow className='justify-content-center'>
         <MDBCol md='2'>
           {/* Conținut coloană stânga */}
@@ -73,7 +90,6 @@ const LatestNews = () => {
                   {newestNews.map((item, index) => (
                     <div className="tweet" key={index}>
                       <div className="tweetHeader">
-                        {/* <img className="userAvatar" src={item.avatarUrl} alt={item.username} /> */}
                         <div className="userInfo">
                           <span className="username">{item.username}</span>
                           <span className="timestamp">{format(new Date(item.dateTime), "yyyy-MM-dd")}</span>
@@ -89,12 +105,11 @@ const LatestNews = () => {
 
               {olderNews.length > 0 && (
                 <div>
-                  <br /><br /><br />
+                  <br /><br />
                   <h3>Older News</h3>
                   {olderNews.map((item, index) => (
                     <div className="tweet" key={index}>
                       <div className="tweetHeader">
-                        {/* <img className="userAvatar" src={item.avatarUrl} alt={item.username} /> */}
                         <div className="userInfo">
                           <span className="username">{item.username}</span>
                           <span className="timestamp">{format(new Date(item.dateTime), "yyyy-MM-dd")}</span>
@@ -107,22 +122,24 @@ const LatestNews = () => {
                   ))}
                 </div>
               )}
-
-
             </div>
           )}
-
         </MDBCol>
 
         <MDBCol md='2'>
           {/* Conținut coloană dreaptă */}
+          {showScrollButton && (
+            <button className="scrollButton" onClick={scrollToTop}>
+              <FontAwesomeIcon icon={faArrowUp} />
+            </button>
+          )}
+
         </MDBCol>
       </MDBRow>
+
+
     </div>
   );
-
-
-
 }
 
 export default LatestNews;

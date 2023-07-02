@@ -1,39 +1,26 @@
 import React from "react";
-import { Nav, NavLink, Bars, NavMenu } from "./NavbarElements";
+// import { Nav, NavLink, Bars, NavMenu } from "./NavbarElements";
+import '../pages/centralizedStyling.css';
+import Container from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
 
-const Navbar = () => {
+const Navigation = () => {
 	return (
-		<>
-			<Nav>
-				<div className="logo">
-					PolitiMood
-				</div>
-				<NavMenu>
-					<NavLink to="/Home" activeStyle>
-						Home
-					</NavLink>
-					{/* <NavLink to="/sign-up" activeStyle>
-						Sign Up
-					</NavLink> */}
-					{/* <NavLink to="/about" activeStyle>
-						About
-					</NavLink> */}
-					<NavLink to="/comparePoliticians" activeStyle>
-						Compare Political Views
-					</NavLink>
-					<NavLink to="/latestNews" activeStyle>
-						Latest News
-					</NavLink>
-					<NavLink to="/scrape-tweets" activeStyle>
-						Scrape Tweets
-					</NavLink>
-					{/* <NavLink to="/SearchTweets" activeStyle>
-						SEARCH Tweets
-					</NavLink> */}
-				</NavMenu>
-			</Nav>
-		</>
+		<Navbar expand="lg" className="navigationBar">
+			<Container>
+				<Navbar.Brand href="Home"><div className="logo">PolitiMood</div></Navbar.Brand>
+				<Navbar.Toggle aria-controls="basic-navbar-nav" />
+				<Navbar.Collapse id="basic-navbar-nav">
+						<Nav.Link href="Home">Home</Nav.Link>
+						<Nav.Link href="latestNews">Latest News</Nav.Link>
+						<Nav.Link href="comparePoliticians">Compare Politicians</Nav.Link>
+						<Nav.Link href="scrape-tweets">Scrape Tweets</Nav.Link>
+
+				</Navbar.Collapse>
+			</Container>
+		</Navbar>
 	);
 };
 
-export default Navbar;
+export default Navigation;
